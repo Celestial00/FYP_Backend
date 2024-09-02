@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Product</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .product-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .product-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        h2 {
+            color: #333;
+        }
+        p {
+            font-size: 16px;
+            color: #666;
+            margin: 10px 0;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Search Product</h2>
+    
+    <!-- Search Form -->
+    <form action="{{ url_for('search_product') }}" method="post">
+        <label for="productId">Product ID:</label>
+        <input type="text" id="productId" name="productId" required>
+        <button type="submit">Search</button>
+    </form>
+
+    <!-- Display Product Details or Error Message -->
+    {% if product %}
+        <div class="product-container">
+            <h2>{{ product['product_name'] }}</h2>
+            <p>{{ url_for('static', filename='images/' ~ product['image_name']) }}</p>
+            <img src="{{ url_for('static', filename='images/' ~ product['image_name']) }}" alt="{{ product['product_name'] }}" class="product-image">
+            <p><strong>Price:</strong> ${{ product['price'] }}</p>
+            <p><strong>Description:</strong> {{ product['description'] }}</p>
+        </div>
+    {% elif error %}
+        <p class="error">{{ error }}</p>
+    {% endif %}
+
+</body>
+</html>
