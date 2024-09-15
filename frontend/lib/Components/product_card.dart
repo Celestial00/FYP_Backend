@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:my_coffee/Components/CustomIcon.dart';
@@ -5,114 +6,129 @@ import 'package:my_coffee/constants/Custom_colors.dart';
 import 'package:my_coffee/pages/Product_Page.dart';
 
 class ProductCard extends StatelessWidget {
-  const ProductCard({super.key});
+  final String Name;
+  final String Desc;
+  final String Price;
+  final String Image_Url;
+
+  ProductCard({
+    super.key,
+    required this.Name,
+    required this.Desc,
+    required this.Price,
+    required this.Image_Url,
+  });
 
   @override
   Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        double cardWidth = constraints.maxWidth * 0.4; // Responsive width
+        double cardHeight = constraints.maxHeight * 0.4; // Responsive height
 
-
-  double ScreenWidth = MediaQuery.of(context).size.width;
-  double Screenheight = MediaQuery.of(context).size.height;
-
-
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => ProductPage(
-                  Name: "sss",
-                  Price: 222,
-                  Desc: "222",
-                  Image:
-                      "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D")),
-        );
-      },
-      child: Container(
-        width: ScreenWidth * 0.40,
-        height: Screenheight * 0.40,
-        decoration: BoxDecoration(
-            color: Color(0xff161b24), borderRadius: BorderRadius.circular(10)),
-        child: Column(
-          children: [
-            //image work
-
-            const ClipRRect(
-              borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(10), topRight: Radius.circular(10)),
-              child: Image(
-                  image: NetworkImage(
-                      "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D")),
-            ),
-
-            // product info
-
-            Container(
-              margin: const EdgeInsets.only(left: 10, top: 10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "type",
-                    style: TextStyle(
-                      fontFamily: "Bebas",
-                      color: Colors.grey[400],
-                      fontSize: 11,
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 3,
-                  ),
-                  const Text(
-                    "hello there hw are youi good whatsup",
-                    style: TextStyle(
-                        fontFamily: "metro",
-                        color: Colors.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold),
-                  ),
-                ],
+        return GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ProductPage(
+                  Name: Name,
+                  Price: Price,
+                  Desc: Desc,
+                  Image_url: Image_Url,
+                ),
               ),
+            );
+          },
+          child: Container(
+            width: cardWidth,
+            height: cardHeight,
+            decoration: BoxDecoration(
+              color: Color(0xff161b24),
+              borderRadius: BorderRadius.circular(10),
             ),
-
-            //price
-
-            const SizedBox(
-              height: 15,
-            ),
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            child: Column(
               children: [
-                Padding(
-                  padding: EdgeInsets.only(left: 10),
-                  child: Container(
-                    width: 30,
-                    height: 30,
-                    child: SvgPicture.asset(
-                      "Assets/icons/heart.svg",
-                  
-                      fit: BoxFit.scaleDown,
-                      color: Colors.orange,
+                // Image section
+                ClipRRect(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(10),
+                    topRight: Radius.circular(10),
+                  ),
+                  child: AspectRatio(
+                      aspectRatio: 1, // Adjust as needed to keep image ratio
+                      child: CachedNetworkImage(
+                        imageUrl: Image_Url,
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) => Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                        errorWidget: (context, url, error) => Center(
+                          child: Icon(Icons.error, color: Colors.red),
+                        ),
+                      )),
+                ),
+
+                // Product info
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "type",
+                          style: TextStyle(
+                            fontFamily: "Bebas",
+                            color: Colors.grey[400],
+                            fontSize: 11,
+                          ),
+                        ),
+                        SizedBox(height: 3),
+                        Text(
+                          Desc,
+                          style: TextStyle(
+                            fontFamily: "metro",
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
-                const Padding(
-                  padding: EdgeInsets.only(right: 10),
-                  child: Text(
-                    "333.30",
-                    style: TextStyle(
-                        fontFamily: "metro",
-                        fontWeight: FontWeight.bold,
+
+                // Price section
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      SvgPicture.asset(
+                        "Assets/icons/heart.svg",
+                        width: 20,
+                        height: 20,
                         color: Colors.orange,
-                        fontSize: 15),
+                      ),
+                      Text(
+                        Price,
+                        style: TextStyle(
+                          fontFamily: "metro",
+                          fontWeight: FontWeight.bold,
+                          color: Colors.orange,
+                          fontSize: 15,
+                        ),
+                      ),
+                    ],
                   ),
-                )
+                ),
               ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'dart:io';
-
+import 'package:http/http.dart' as http;
+import 'dart:convert'; // For jsonEncode
 import 'package:flutter/material.dart';
 import 'package:my_coffee/Components/product_card.dart';
 
@@ -12,10 +13,54 @@ class SearchPage extends StatefulWidget {
 }
 
 class _SearchPageState extends State<SearchPage> {
+  var LocalAddress = "http://192.168.10.5:5000";
+  var localImageAdd = "http://192.168.10.5:5000/";
+  List<dynamic> Products = [];
+
+  Future<void> uploadImage(File imageFile) async {
+    final url = Uri.parse(LocalAddress + '/upload'); // Replace with your URL
+
+    final request = http.MultipartRequest('POST', url)
+      ..fields['fieldName'] =
+          'fieldValue' // Add any additional fields if needed
+      ..files.add(await http.MultipartFile.fromPath('file', imageFile.path));
+
+    final response = await request
+        .send(); // Sends the request and returns a StreamedResponse
+
+    // Get the response body as a string
+    final responseBody = await response.stream.bytesToString();
+
+    if (response.statusCode == 200) {
+      print("Upload successful");
+
+      // Decode the response body as JSON
+      final jsonData = jsonDecode(responseBody);
+
+      Products = jsonData;
+
+      setState(() {
+        
+      });
+
+     
+   
+      // You can use the 'products' list to display data in your UI
+    } else {
+      print('Failed to upload image');
+      print("Response: $responseBody");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
         child: Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => uploadImage(widget.imageFile),
+        backgroundColor: Color(0xFF151515),
+        child: Icon(Icons.search_outlined),
+      ),
       backgroundColor: Color(0xff0c0f14),
       appBar: AppBar(
         title: Text(
@@ -45,10 +90,8 @@ class _SearchPageState extends State<SearchPage> {
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12), color: Colors.red),
                 child: Image.file(
-                  
                   widget.imageFile,
                   fit: BoxFit.cover,
-                  
                 ),
               ),
 
@@ -66,15 +109,23 @@ class _SearchPageState extends State<SearchPage> {
               GridView.builder(
                 physics: NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
-                itemCount: 4,
-                gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                itemCount: Products.length,
+                gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
                   maxCrossAxisExtent: 200.0,
                   childAspectRatio: 0.75, // Adjusted for taller content
                   crossAxisSpacing: 8.0,
                   mainAxisSpacing: 20.0,
                 ),
                 itemBuilder: (context, index) {
-                  return const ProductCard();
+
+                         final product = Products[index];
+
+                  return ProductCard(
+                    Name: product['product_name'],
+                    Desc: product['description'],
+                    Price: product['price'],
+                    Image_Url: localImageAdd + product['image_path'],
+                  );
                 },
               ),
             ],
