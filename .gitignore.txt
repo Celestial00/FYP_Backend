@@ -1,3 +1,4 @@
 
 /admin/node_modules
 /backend/venv
+/backend/config/firebase_credentials.json
