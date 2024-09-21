@@ -16,17 +16,25 @@ const UserProvider = ({ children }) => {
   });
 
   // Function to add a user
-  const addUser = (user) => {
-    setUsers({Signed: true, name: user.Name }); // Generate a unique ID for each user
+  const addUser = (user, _id) => {
+    let name = user.Name
+    
+    setUsers({ id: _id, Signed: true, name: name }); 
   };
 
   // Function to delete a user
-  const deleteUser = (userId) => {
+  const deleteUser = () => {
     setUsers({});
   };
 
+  const getId = () =>{
+
+    return user
+
+  }
+
   return (
-    <UserContext.Provider value={{ user, addUser, deleteUser }}>
+    <UserContext.Provider value={{ user, addUser, deleteUser, getId }}>
       {children}
     </UserContext.Provider>
   );

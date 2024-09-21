@@ -128,6 +128,61 @@ def convert_image_to_jpg_if_needed(file_storage):
 #routes 
 
 
+@app.route('/products/<user_id>', methods=['GET'])
+def get_products(user_id):
+    try:
+        # Query the Firestore collection for products associated with the user ID
+        products_ref = db.collection('products')
+        query = products_ref.where('user_id', '==', user_id)
+        results = query.stream()
+
+        products = []
+        for doc in results:
+            product_data = doc.to_dict()
+            product_data['id'] = doc.id  # Add document ID to product data
+            products.append(product_data)
+
+        return jsonify(products), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+
+#seller registeration 
+
+@app.route('/auth/signUp', methods=['POST'])
+def auth():
+    try:
+        # Get data from the frontend
+        data = request.json
+        name = data.get('Name')
+        email = data.get('Email')
+        password = data.get('Password')
+        
+        # Basic validation
+        if not email or not password:
+            return jsonify({"error": "Email and Password are required"}), 400
+        
+        # Save user data to Firebase Firestore in "Admins" collection
+        users_ref = db.collection('Admins').document()
+        users_ref.set({
+            'Name' : name,
+            'Email': email,
+            'Password': password  # In a real-world app, never store raw passwords, always hash them!
+        })
+        
+        # Return success response
+        return jsonify({"message": "User saved successfully"}), 201
+    
+    except Exception as e:
+        print(f"Error occurred: {e}")
+        return jsonify({"error": "An error occurred while saving the user"}), 500
+
+
+
+
+
 @app.route('/images/<path:filename>')
 def serve_image(filename):
     return send_from_directory('static/images', filename)
@@ -166,7 +221,7 @@ def Get_All_Products():
 
 
 
-@app.route('/auth' , methods=["POST"])
+@app.route('/auth/signIn', methods=["POST"])
 def user_Auth():
     Email = request.json.get('Email')
     Password = request.json.get('Password')
@@ -178,12 +233,13 @@ def user_Auth():
         # Query Firestore collection 'Admin' for the user with the given Email
         admin_ref = db.collection('Admins').where('Email', '==', Email).stream()
         user_data = None
+        user_id = None
 
         for user in admin_ref:
             user_data = user.to_dict()
-
-        
-        print(user_data)
+            user_id = user.id  # Retrieve the document ID
+            
+    
         
         # If user is not found
         if not user_data:
@@ -192,14 +248,17 @@ def user_Auth():
         # Verify Password (assume plain text Password, you may want to hash Passwords)
         if user_data['Password'] == Password:
             # Authentication successful
-            return jsonify({"message": "Authentication successful", "user": user_data}), 200
+            return jsonify({
+                "message": "Authentication successful",
+                "user": user_data,
+                "id": user_id  # Return the document ID
+            }), 200
         else:
             # Incorrect Password
             return jsonify({"error": "Invalid Email or Password"}), 401
 
     except Exception as e:
         return jsonify({"error": f"An error occurred: {str(e)}"}), 500
-
 
 
 
@@ -238,6 +297,7 @@ def form_handler():
 @app.route('/add_product', methods=['POST'])
 def submit_product():
     try:
+        user_id = request.form['user_id']
         product_name = request.form['productName']
         price = request.form['price']
         description = request.form['description']
@@ -259,6 +319,7 @@ def submit_product():
         # Save product details to Firestore
         doc_ref = db.collection('products').document(unique_id)
         doc_ref.set({
+            "user_id" : user_id,
             'product_name': product_name,
             'price': price,
             'description': description,
@@ -280,7 +341,7 @@ def submit_product():
         return str(e), 500
 
     # Redirect to the home page or another page
-    return redirect(url_for('index'))
+    return jsonify("done") , 200
 
 
 

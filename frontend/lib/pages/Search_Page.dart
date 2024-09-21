@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert'; // For jsonEncode
 import 'package:flutter/material.dart';
 import 'package:my_coffee/Components/product_card.dart';
+import 'package:my_coffee/constants/Server_Add.dart';
 
 class SearchPage extends StatefulWidget {
   final File imageFile;
@@ -13,8 +14,8 @@ class SearchPage extends StatefulWidget {
 }
 
 class _SearchPageState extends State<SearchPage> {
-  var LocalAddress = "http://192.168.10.5:5000";
-  var localImageAdd = "http://192.168.10.5:5000/";
+  var LocalAddress = ServerAdd.GetAdd();
+  var localImageAdd = ServerAdd.getAddLocImage();
   List<dynamic> Products = [];
 
   Future<void> uploadImage(File imageFile) async {

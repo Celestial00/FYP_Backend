@@ -4,8 +4,7 @@ import 'package:my_coffee/pages/Cart_Page.dart';
 import 'package:my_coffee/pages/Favorite_Page.dart';
 import 'package:my_coffee/pages/Home_Page.dart';
 import 'package:flutter/services.dart';
-import 'package:my_coffee/pages/Search_Page.dart';
-import 'package:my_coffee/pages/debug_Screen.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

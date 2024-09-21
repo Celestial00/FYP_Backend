@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
+import 'package:my_coffee/constants/Server_Add.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import 'package:my_coffee/Components/CustomIcon.dart';
@@ -48,7 +49,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   File? imageFile;
   List<Product> products = [];
-  var localImageAdd = "http://192.168.10.5:5000/";
+  var localImageAdd = ServerAdd.getAddLocImage();
 
   @override
   void initState() {
@@ -58,7 +59,7 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> fetchProducts() async {
     final response = await http.get(
-      Uri.parse('http://192.168.10.5:5000/getProducts'),
+      Uri.parse( ServerAdd.GetAdd() + '/getProducts'),
       headers: {"Content-Type": "application/json"},
     );
 
@@ -157,6 +158,7 @@ class _HomePageState extends State<HomePage> {
                     itemBuilder: (context, index) {
                       final product = products[index];
 
+                   
               
 
                       return ProductCard(
@@ -164,6 +166,7 @@ class _HomePageState extends State<HomePage> {
                         Desc: product.description,
                         Price: product.price,
                         Image_Url: localImageAdd + product.imageUrl,
+
                       );
                     },
                   ),
